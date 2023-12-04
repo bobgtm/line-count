@@ -8,7 +8,7 @@ import (
 func main() {
 	files := WalkDirectory(".")
 
-	ignoreRequest := []string{"main.go"}
+	ignoreRequest := []string{"main.go", "gitignore"}
 
 	for k, v := range files {
 		for i := 0; i < len(ignoreRequest); i++ {
@@ -18,6 +18,8 @@ func main() {
 		}
 	}
 	for _, v := range files {
-		fmt.Println(v.name, v.lines)
+		if v.lines != 0 {
+			fmt.Println(v.name, v.lines)
+		}
 	}
 }
