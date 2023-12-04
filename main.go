@@ -2,17 +2,22 @@ package main
 
 import (
 	"fmt"
+	"strings"
 )
 
 func main() {
-
 	files := WalkDirectory(".")
 
-	for _, v := range files {
-		if v.lines != 0 {
-			fmt.Printf("%s: %d line(s)\n", v.name, v.lines)
+	ignoreRequest := []string{"main.go"}
+
+	for k, v := range files {
+		for i := 0; i < len(ignoreRequest); i++ {
+			if strings.Contains(v.name, ignoreRequest[i]) {
+				delete(files, k)
+			}
 		}
-
 	}
-
+	for _, v := range files {
+		fmt.Println(v.name, v.lines)
+	}
 }
