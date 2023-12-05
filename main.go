@@ -1,21 +1,40 @@
 package main
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
 	"os"
 	"strings"
+	"time"
 )
 
 func main() {
 
-	files := WalkDirectory(".")
-
+	// If -n is used, program runs in non-interactive mode
+	interactive := flag.Bool("i", false, "Run Program in interactive mode")
 	excludeFile := flag.Bool("f", false, "Name files to exclude from count")
 	flag.Parse()
-
+	var files = make(map[string]FileInf)
+	var dir string
 	total := 0
 	switch {
+	case *interactive:
+		fmt.Println("Which directory's files would you like to count?")
+		fmt.Println("OR type \"help\" to see a list of options")
+		scanner := bufio.NewScanner(os.Stdin)
+		fmt.Print("> ")
+		scanner.Scan()
+		text := scanner.Text()
+		cleaned := cleanInput(text)
+
+		if len(cleaned) == 0 {
+			fmt.Println("please enter in a directory name whose files you would like to count")
+			os.Exit(1)
+		}
+		dir = cleaned[0]
+		fmt.Printf("Counting files for directory: %s", dir)
+		time.Sleep(time.Second * 3)
 	case *excludeFile:
 		ignoreRequest := os.Args[2:]
 		for k, v := range files {
@@ -28,6 +47,7 @@ func main() {
 	default:
 		break
 	}
+	files = WalkDirectory(dir)
 	for _, v := range files {
 		if v.lines != 0 {
 			fmt.Println(v.name, v.lines)
@@ -35,4 +55,10 @@ func main() {
 		total += v.lines
 	}
 	fmt.Println("Total lines in codebase:", total)
+}
+
+func cleanInput(str string) []string {
+	lowered := strings.ToLower(str)
+	words := strings.Fields(lowered)
+	return words
 }
