@@ -33,7 +33,20 @@ func main() {
 			os.Exit(1)
 		}
 		dir = cleaned[0]
-		fmt.Printf("Counting files for directory: %s", dir)
+		fmt.Println("Which files would you like to ignore?")
+		scanner.Scan()
+		ignoreRequest := scanner.Text()
+		cleanedFiles := cleanInput(ignoreRequest)
+		files = WalkDirectory(dir)
+		for k, v := range files {
+			for i := 0; i < len(cleanedFiles); i++ {
+				if strings.Contains(v.name, cleanedFiles[i]) {
+					delete(files, k)
+				}
+			}
+		}
+
+		fmt.Printf("Counting files for directory: %s\n", dir)
 		time.Sleep(time.Second * 3)
 	case *excludeFile:
 		ignoreRequest := os.Args[2:]
@@ -47,7 +60,7 @@ func main() {
 	default:
 		break
 	}
-	files = WalkDirectory(dir)
+
 	for _, v := range files {
 		if v.lines != 0 {
 			fmt.Println(v.name, v.lines)
