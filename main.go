@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-
+	files = make(map[string]FileInf)
 	// If -n is used, program runs in non-interactive mode
 	interactive := flag.Bool("i", false, "Run Program in interactive mode")
 	excludeFile := flag.Bool("f", false, "Name files to exclude from count")
@@ -16,12 +16,12 @@ func main() {
 	total := 0
 	switch {
 	case *interactive:
-		interactCommand()
+		files = interactCommand()
 	case *excludeFile:
 		ignoreRequest := os.Args[2:]
 		ignoreRequestFunc(files, ignoreRequest)
 	default:
-		break
+		files = WalkDirectory(".")
 	}
 
 	for _, v := range files {
