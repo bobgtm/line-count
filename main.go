@@ -4,37 +4,33 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"strings"
+
+	"github.com/bobgtm/linecount/internal"
 )
 
 func main() {
-	files = make(map[string]FileInf)
+
 	// If -n is used, program runs in non-interactive mode
 	interactive := flag.Bool("i", false, "Run Program in interactive mode")
 	excludeFile := flag.Bool("f", false, "Name files to exclude from count")
 	flag.Parse()
 	total := 0
+	files := internal.WalkDirectory(".")
 	switch {
 	case *interactive:
-		files = interactCommand()
+		files = internal.InteractCommand()
 	case *excludeFile:
 		ignoreRequest := os.Args[2:]
-		ignoreRequestFunc(files, ignoreRequest)
+		files = internal.IgnoreRequestFunc(ignoreRequest, files)
 	default:
-		files = WalkDirectory(".")
+		break
 	}
 
 	for _, v := range files {
-		if v.lines != 0 {
-			fmt.Println(v.name, v.lines)
+		if v.Lines != 0 {
+			fmt.Println(v.Name, v.Lines)
 		}
-		total += v.lines
+		total += v.Lines
 	}
 	fmt.Println("Total lines in codebase:", total)
-}
-
-func cleanInput(str string) []string {
-	lowered := strings.ToLower(str)
-	words := strings.Fields(lowered)
-	return words
 }

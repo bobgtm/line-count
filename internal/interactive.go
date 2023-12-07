@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"bufio"
@@ -12,7 +12,7 @@ import (
 var dir string
 var files = make(map[string]FileInf)
 
-func interactCommand() map[string]FileInf {
+func InteractCommand() map[string]FileInf {
 	fmt.Println("Which directory's files would you like to count?")
 	fmt.Println("OR type \"help\" to see a list of options")
 	scanner := bufio.NewScanner(os.Stdin)
@@ -36,17 +36,25 @@ func interactCommand() map[string]FileInf {
 	fmt.Printf("- Counting files for directory: %s\n- Ignoring files: %v\n", dir, cleanedFilesIgnored)
 	fmt.Println("- - - - - - - - - - - - - - - - - - - ")
 	time.Sleep(time.Second * 1)
-	dirWithIgnoredFiles := ignoreRequestFunc(files, cleanedFilesIgnored)
+	dirWithIgnoredFiles := IgnoreRequestFunc(cleanedFilesIgnored, files)
 	return dirWithIgnoredFiles
 }
 
-func ignoreRequestFunc(files map[string]FileInf, cleanedFilesIgnored []string) map[string]FileInf {
-	for k, v := range files {
-		for i := 0; i < len(cleanedFilesIgnored); i++ {
-			if strings.Contains(v.name, cleanedFilesIgnored[i]) {
+// IgnoreRequestFunc takes a string slice of file names which have been requested to be ignored in the count. The slice is iterated over to get its values which are checked against the values of the files map, in this case, the value v.Name of the FileInf struct.
+// If these match, the file is removed from the files map and is returned to be counted in the rest of the program flow.
+func IgnoreRequestFunc(cleanedFilesIgnored []string, files map[string]FileInf) map[string]FileInf {
+	for i := 0; i < len(cleanedFilesIgnored); i++ {
+		for k, v := range files {
+			if strings.Contains(v.Name, cleanedFilesIgnored[i]) {
 				delete(files, k)
 			}
 		}
 	}
 	return files
+}
+
+func cleanInput(str string) []string {
+	lowered := strings.ToLower(str)
+	words := strings.Fields(lowered)
+	return words
 }

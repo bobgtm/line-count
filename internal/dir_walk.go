@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"bufio"
@@ -9,8 +9,8 @@ import (
 )
 
 type FileInf struct {
-	name  string
-	lines int
+	Name  string
+	Lines int
 }
 
 func WalkDirectory(dir string) map[string]FileInf {
